@@ -1,4 +1,4 @@
-# СryptologyLibrarium
+# Сryptology-Librarium
 
 **cryptolibrium** is a C++ library focused on cryptographic algorithms,
 classical ciphers, encryption techniques and cryptanalysis tools.
