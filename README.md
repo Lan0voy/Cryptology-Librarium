@@ -1,33 +1,110 @@
-# Cryptology
+# СryptologyLibrarium
 
-The repository is organized as a collection of separate projects and additional materials. It is not a single CMake project, so each program should be opened, built and launched separately.
+**cryptolibrium** is a C++ library focused on cryptographic algorithms,
+classical ciphers, encryption techniques and cryptanalysis tools.
 
-Main folders:
+The goal of this project is not only to provide implementations of
+cryptographic algorithms, but also to create an educational environment
+for studying how these algorithms work.
 
-- `CLASSICAL CIPHERS AND THEIR CRYPTOANALYSIS` — classical cipher implementations.
-- `rsa` — RSA algorithm implementation.
-- `Notes` — additional notes.
-- `_books` — additional study materials.
+---
 
-Inside `CLASSICAL CIPHERS AND THEIR CRYPTOANALYSIS` there are separate projects:
+## Status
 
-- `CaesarCipher`
-- `PlayferCipher`
-- `RailFenceCipher`
-- `HillsCryptographicSystem`
-- `VisenersCipher`
-- `FrequencyAnalysisCaesarCipher`
-- `KaziskiFriedmanMethod`
-  
-## How to download the repository
+Currently under active development.
 
-First, install Git and a C++ development environment.
+# Features
 
-For Windows, the recommended option is Visual Studio with the component:
+Currently supported:
 
-`Desktop development with C++`
+## Classical ciphers
 
-Then clone the repository:
+- Caesar cipher
+- Vigenere cipher
+- Substitution ciphers
+
+## Symmetric encryption
+
+- AES (planned)
+
+## Asymmetric encryption
+
+- RSA (planned)
+
+## Cryptanalysis
+
+- Frequency analysis
+- Brute-force attacks
+- Statistical analysis
+
+## Hash algorithms
+
+- SHA family (planned)
+
+---
+
+# Project structure
+```text
+cryptologyLibrarium
+│
+├── cryptolibrium
+│   ├── include
+│   │   └── cryptolibrium
+│   │       ├── cipher
+│   │       │   └── caesar_cipher.hpp
+│   │       ├── hash
+│   │       └── analysis
+│   │
+│   ├── src
+│   │   └── cipher
+│   │       └── caesar_cipher.cpp
+│   │
+│   └── CMakeLists.txt
+│
+├── examples
+├── tests
+├── docs
+└── README.md
+```
+
+# Installation
+
+## Requirements
+
+- C++17 compatible compiler
+- CMake 3.20+
+
+## Build
 
 ```bash
-git clone https://github.com/Lan0voy/Cryptology.git
+git clone https://github.com/Lan0voy/cryptologyLibrarium.git
+
+cd cryptologyLibrarium
+
+mkdir build
+cd build
+
+cmake ..
+cmake --build .
+```
+
+# Quick start
+
+```cpp
+#include <cryptolibrium/cipher/caesar_cipher.hpp>
+
+#include <iostream>
+
+
+int main()
+{
+    cryptolibrium::cipher::CaesarCipher cipher(3);
+
+    auto encrypted = cipher.encrypt("HELLO");
+
+    auto decrypted = cipher.decrypt(encrypted);
+
+
+    std::cout << encrypted << '\n';
+    std::cout << decrypted << '\n';
+}
