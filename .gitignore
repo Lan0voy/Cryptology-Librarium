@@ -1,16 +1,16 @@
-# test output & cache
-Testing/
-.cache/
+# Build directories
+build/
+cmake-build-*/
 
-*.mkv
-*.rar
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
 
-.vs/
-*.vcxproj.user
-*.VC.db
-*.suo
-*.pdb
-*.exe
-Debug/
-Release/
-x64/
+# Compiled files
+*.o
+*.obj
+*.a
+*.so
+*.dll
