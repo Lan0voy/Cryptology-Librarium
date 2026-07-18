@@ -77,7 +77,7 @@ cryptologyLibrarium
 ## Build
 
 ```bash
-git clone https://github.com/Lan0voy/cryptologyLibrarium.git
+git clone https://github.com/Lan0voy/CryptologyLibrarium.git
 
 cd cryptologyLibrarium
 
