@@ -45,6 +45,9 @@ namespace cryptolibrium::cipher {
             // 5×5 Playfair key square.
             std::array<std::array<char, MatrixSize>, MatrixSize> matrix_;
 
+            // Prepare the key by removing duplicates and non-alphabetic characters, and converting to uppercase.
+            std::string prepareKey(const std::string& key) const;
+
             // Generate the Playfair key square from the keyword.
             void generateMatrix();
 
