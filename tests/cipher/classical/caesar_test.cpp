@@ -42,5 +42,11 @@ int main() {
         caesarCipher.decrypt(caesarCipher.encrypt(text)) == text
     );
 
+
+    CaesarCipher caesarCipher2(-3);
+
+    assert(caesarCipher2.encrypt("HELLO") == "EBIIL");
+    assert(caesarCipher2.decrypt("EBIIL") == "HELLO");
+
     std::cout << "All tests passed!" << std::endl;
 }

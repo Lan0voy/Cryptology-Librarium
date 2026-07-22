@@ -4,7 +4,7 @@ namespace cryptolibrium::cipher {
     static constexpr int AlphabetSize = 26;  // Number of letters in the English alphabet
 
     // Constructor to initialize the CaesarCipher with a specific shift value
-    CaesarCipher::CaesarCipher(int shift) : shift_(shift) {}
+    CaesarCipher::CaesarCipher(int shift) : shift_(((shift % AlphabetSize) + AlphabetSize) % AlphabetSize) {}
 
     // Encrypt the input plaintext using the Caesar cipher technique
     std::string CaesarCipher::encrypt(const std::string& plaintext) const {
