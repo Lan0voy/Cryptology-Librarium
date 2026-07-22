@@ -24,8 +24,11 @@ namespace cryptolibrium {
         }
 
         for (char symbol : key) {
-            // Check if the character is alphabetic and throw an exception if it is not
-            if (symbol != ' ' && !std::isalpha(static_cast<unsigned char>(symbol))) {
+            // Check if the character is alphabetic or a whitespace character (space, tab, newline)
+            if ((symbol != ' ') && 
+                (symbol != '\t') && 
+                (symbol != '\n') && 
+                (symbol < 'A' || symbol > 'Z') && (symbol < 'a' || symbol > 'z')) {
                 throw std::invalid_argument("Key must contain only alphabetic characters.");
             }
         }
@@ -51,7 +54,7 @@ namespace cryptolibrium {
 
         // Only add alphabetic characters that are not already in the prepared key
         for (char symbol : uppercaseKey) {
-            if (std::isalpha(static_cast<unsigned char>(symbol)) && (preparedKey.find(symbol) == std::string::npos)) {
+            if ((symbol >= 'A' && symbol <= 'Z') && (preparedKey.find(symbol) == std::string::npos)) {
                 preparedKey += symbol;
             }
         }
