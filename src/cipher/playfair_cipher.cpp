@@ -23,14 +23,25 @@ namespace cryptolibrium {
             throw std::invalid_argument("Key cannot be empty.");
         }
 
+        int letterCounter = 0;
+        // Check if the characters are alphabetic or a whitespace character (space, tab, newline)
         for (char symbol : key) {
-            // Check if the character is alphabetic or a whitespace character (space, tab, newline)
-            if ((symbol != ' ') && 
-                (symbol != '\t') && 
-                (symbol != '\n') && 
-                (symbol < 'A' || symbol > 'Z') && (symbol < 'a' || symbol > 'z')) {
-                throw std::invalid_argument("Key must contain only alphabetic characters.");
+            const bool isUpper = symbol >= 'A' && symbol <= 'Z';
+            const bool isLower = symbol >= 'a' && symbol <= 'z';
+            const bool isWhitespace = symbol == ' ' || symbol == '\t' || symbol == '\n';
+
+            if (!isUpper && !isLower && !isWhitespace) {
+                throw std::invalid_argument("Key must contain only English alphabetic characters and whitespaces.");
             }
+
+            if (isUpper || isLower) {
+                ++letterCounter;
+            }
+        }
+
+        // Check if the key contains at least one letter and throw an exception if it does not
+        if (letterCounter == 0) {
+            throw std::invalid_argument("Key must contain at least one letter.");
         }
     }
 

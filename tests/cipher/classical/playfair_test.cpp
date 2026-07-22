@@ -47,4 +47,5 @@ int main() {
     expectInvalidKey("@#$%^&*", "1.10 Key with only symbols");
     expectInvalidKey("12345", "1.11 Key with only digits");
     expectInvalidKey("ыуауйа", "1.12 Key with non-Latin characters");
+    expectInvalidKey(" ", "1.13 Key with only whitespace");
 }
