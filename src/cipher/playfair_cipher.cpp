@@ -25,7 +25,7 @@ namespace cryptolibrium {
 
         for (char symbol : key) {
             // Check if the character is alphabetic and throw an exception if it is not
-            if (std::isalpha(static_cast<unsigned char>(symbol)) == 0) {
+            if (symbol != ' ' && !std::isalpha(static_cast<unsigned char>(symbol))) {
                 throw std::invalid_argument("Key must contain only alphabetic characters.");
             }
         }
@@ -51,7 +51,7 @@ namespace cryptolibrium {
 
         // Only add alphabetic characters that are not already in the prepared key
         for (char symbol : uppercaseKey) {
-            if ((std::isalpha(static_cast<unsigned char>(symbol))) && (preparedKey.find(symbol) == std::string::npos)) {
+            if (std::isalpha(static_cast<unsigned char>(symbol)) && (preparedKey.find(symbol) == std::string::npos)) {
                 preparedKey += symbol;
             }
         }
@@ -63,7 +63,7 @@ namespace cryptolibrium {
     // Implementation for generating the Playfair key square from the keyword
     // This function will fill the matrix_ member variable based on the key_   
     void cipher::PlayfairCipher::generateMatrix() {  
-        // Normalize the key by preparin it
+        // Normalize the key by preparing it
         std::string preparedKey = prepareKey(key_);
         
         // Fill the matrix with the prepared key and remaining letters of the alphabet
