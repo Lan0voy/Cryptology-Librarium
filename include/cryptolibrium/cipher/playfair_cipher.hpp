@@ -48,6 +48,9 @@ namespace cryptolibrium::cipher {
             // Prepare the key by removing duplicates and non-alphabetic characters, and converting to uppercase.
             std::string prepareKey(const std::string& key) const;
 
+            // Validate the key to ensure it meets the requirements for the Playfair cipher.
+            void validateKey(const std::string& key) const;
+
             // Generate the Playfair key square from the keyword.
             void generateMatrix();
 
