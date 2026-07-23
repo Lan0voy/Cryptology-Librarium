@@ -1,6 +1,7 @@
 # CMakeLists.txt for cryptologylibrarium
 cmake_minimum_required(VERSION 3.20)
 
+
 # Set the project name and version
 project(
     cryptolibrium
@@ -8,6 +9,7 @@ project(
     DESCRIPTION "A cryptography library"
     LANGUAGES CXX
 )
+
 
 # Set the C++ standard to C++20
 set(CMAKE_CXX_STANDARD 20)
@@ -20,9 +22,11 @@ file(GLOB_RECURSE SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
 
+
 add_library(
     cryptolibrium ${SOURCES}
 )
+
 
 # Add include directories
 target_include_directories(
@@ -31,11 +35,13 @@ target_include_directories(
         ${PROJECT_SOURCE_DIR}/include
 )
 
+
 # Add example executable
 add_executable(
     caesar_example
     examples/cipher/classical/caesar_example.cpp
 )
+
 
 # Link the example executable with the library
 target_link_libraries(
@@ -43,6 +49,21 @@ target_link_libraries(
     PRIVATE
         cryptolibrium
 )
+
+
+# Playfair cipher example
+add_executable(
+    playfair_example
+    examples/cipher/classical/playfair_example.cpp
+)
+
+
+target_link_libraries(
+    playfair_example
+    PRIVATE
+        cryptolibrium
+)
+
 
 # Set compiler warnings
 if (MSVC)
@@ -55,11 +76,13 @@ endif()
 # Add tests
 enable_testing()
 
+
 # Add test sources
 file(GLOB_RECURSE TEST_SOURCES
     CONFIGURE_DEPENDS
     "${PROJECT_SOURCE_DIR}/tests/*.cpp"
 )
+
 
 # Create test executables and add them to CTest
 foreach(test_source ${TEST_SOURCES})

@@ -45,14 +45,26 @@ namespace cryptolibrium::cipher {
             // 5×5 Playfair key square.
             std::array<std::array<char, MatrixSize>, MatrixSize> matrix_;
 
+            // Prepare the key by removing duplicates and non-alphabetic characters, and converting to uppercase.
+            std::string prepareKey(const std::string& key) const;
+
+            // Validate the key to ensure it meets the requirements for the Playfair cipher.
+            void validateKey(const std::string& key) const;
+   
+            // Validate the encrypted text to use it in decrypt function
+            void validateCipherText(const std::string& encryptedText) const;
+
             // Generate the Playfair key square from the keyword.
             void generateMatrix();
 
             // Normalize text and prepare Playfair digraphs for processing.
-            std::string prepareText(const std::string& text) const;
+            std::string preparePlaintext(const std::string& text) const;
+
+            // Normalize text and prepare digraphs for decrypting.
+            std::string prepareCiphertext(const std::string& ciphertext) const;
 
             // Find the position of a character in the key square.
-            Position findPosition(char c) const;
+            Position findPosition(char symbol) const;
 
             // Encrypt a single Playfair digraph.
             std::pair<char, char> encryptPair(char first, char second) const;
