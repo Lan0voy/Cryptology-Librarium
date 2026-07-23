@@ -51,6 +51,20 @@ target_link_libraries(
 )
 
 
+# Playfair cipher example
+add_executable(
+    playfair_example
+    examples/cipher/classical/playfair_example.cpp
+)
+
+
+target_link_libraries(
+    playfair_example
+    PRIVATE
+        cryptolibrium
+)
+
+
 # Set compiler warnings
 if (MSVC)
     target_compile_options(cryptolibrium PRIVATE /W4)
