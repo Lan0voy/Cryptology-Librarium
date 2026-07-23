@@ -10,6 +10,7 @@ using cryptolibrium::cipher::PlayfairCipher;
 void expectValidKey(const std::string& key, const std::string& testCaseDescription) {
     try {
         PlayfairCipher cipher(key);
+        
         std::cout << "✓ " <<  testCaseDescription << " test passed." << std::endl;
     } catch (const std::invalid_argument& e) {
         std::cerr << "✗ " << testCaseDescription << " test failed: " << e.what() << std::endl;
@@ -48,4 +49,28 @@ int main() {
     expectInvalidKey("12345", "1.11 Key with only digits");
     expectInvalidKey("ыуауйа", "1.12 Key with non-Latin characters");
     expectInvalidKey(" ", "1.13 Key with only whitespace");
+
+    // Encrypt && Decrypt tests
+    PlayfairCipher playfairCipher("PLAYFAIR EXAMPLE");
+
+    assert(playfairCipher.encrypt("HIDETHEGOLDINTHETREESTUMP") == "BMODZBXDNABEKUDMUIXMMOUVIF");
+    assert(playfairCipher.decrypt("BMODZBXDNABEKUDMUIXMMOUVIF") == "HIDETHEGOLDINTHETREXESTUMP");
+    
+    assert(playfairCipher.decrypt(playfairCipher.encrypt("COMPUTER")) == "COMPUTER");
+    assert(playfairCipher.decrypt(playfairCipher.encrypt("SECURITY")) == "SECURITY");
+    assert(playfairCipher.decrypt(playfairCipher.encrypt("NETWORK")) == "NETWORKX");
+    assert(playfairCipher.decrypt(playfairCipher.encrypt("PROGRAM")) == "PROGRAMX");
+    assert(playfairCipher.decrypt(playfairCipher.encrypt("DATABASE")) == "DATABASE");
+
+    assert(playfairCipher.decrypt(
+           playfairCipher.encrypt("Hello World"))
+       == "HELXLOWORLDX");
+
+    assert(playfairCipher.decrypt(
+           playfairCipher.encrypt("Computer Science"))
+       == "COMPUTERSCIENCEX");
+
+    assert(playfairCipher.decrypt(
+           playfairCipher.encrypt("JIG"))
+       == "IXIG");
 }

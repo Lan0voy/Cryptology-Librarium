@@ -24,6 +24,7 @@ namespace cryptolibrium {
         }
 
         int letterCounter = 0;
+
         // Check if the characters are alphabetic or a whitespace character (space, tab, newline)
         for (char symbol : key) {
             const bool isUpper = symbol >= 'A' && symbol <= 'Z';
@@ -42,6 +43,37 @@ namespace cryptolibrium {
         // Check if the key contains at least one letter and throw an exception if it does not
         if (letterCounter == 0) {
             throw std::invalid_argument("Key must contain at least one letter.");
+        }
+    }
+    
+    
+    // Implementation for validating the encrypted text to ensure it meets the requirements for the Playfair decrypt function
+    // This function will throw an exception if text is invalid
+    void cipher::PlayfairCipher::validateCipherText(const std::string& cipherText) const {
+        if (cipherText.empty()) {
+            throw std::invalid_argument("Encrypted text cannot be empty.");
+        }
+
+        int letterCounter = 0;
+
+        // Check if the characters are alphabetic (not 'J') or a whitespace character (space, tab, newline)
+        for (char symbol : cipherText) {
+            const bool isUpper = symbol >= 'A' && symbol <= 'Z';
+            const bool isLower = symbol >= 'a' && symbol <= 'z';
+            const bool isWhitespace = symbol == ' ' || symbol == '\t' || symbol == '\n';
+
+            if (!isUpper && !isLower && !isWhitespace) {
+                throw std::invalid_argument("Encrypted text must contain only English alphabetic characters and whitespaces.");
+            }
+
+            if (isUpper || isLower) {
+                ++letterCounter;
+            }
+        }
+
+        // Check if the key contains at least two letters and throw an exception if it does not
+        if ((letterCounter < 2) || (letterCounter % 2 != 0)) {
+            throw std::invalid_argument("Encrypted text must contain even number of letters, at least two.");
         }
     }
 
@@ -106,42 +138,183 @@ namespace cryptolibrium {
 
     // Implementation for normalizing text and preparing Playfair digraphs
     // This function will return a string that is ready for encryption or decryption
-    std::string cipher::PlayfairCipher::prepareText(const std::string& text) const {
-        
+    std::string cipher::PlayfairCipher::preparePlaintext(const std::string& text) const {
+        std::string preparedText = "";
+
+        // Convert each character to uppercase && change J -> I
+        for (char symbol : text) {
+            if (((symbol >= 'A') && (symbol <= 'Z')) || ((symbol >= 'a') && (symbol <= 'z'))) {
+                symbol = std::toupper(static_cast<unsigned char>(symbol));
+
+                // Replace 'J' with 'I' for Playfair cipher
+                if (symbol == 'J') {
+                    symbol = 'I';
+                }
+
+                preparedText += symbol;
+            }
+        }
+
+        // Additional 'X' for bigrams
+        std::size_t textLength = preparedText.size();
+
+        for (std::size_t i = 0; i + 1 < textLength; i += 2) {
+            if (preparedText[i] == preparedText[i + 1]) {
+                preparedText.insert(i + 1, 1, 'X');
+                textLength++;
+            }
+        }
+
+        if (textLength % 2 == 1) {
+            preparedText += 'X';
+        }
+
+
+        return preparedText;
     }
+
+    // Implementation for normalizing text and preparing Playfair digraphs
+    // This function will return a string that is ready for encryption or decryption
+    std::string cipher::PlayfairCipher::prepareCiphertext(const std::string& ciphertext) const {
+        std::string preparedText = "";
+
+        // Convert each character to uppercase && change J -> I
+        // Remove non-alphabetic characters
+        for (char symbol : ciphertext) {
+            if (((symbol >= 'A') && (symbol <= 'Z')) || ((symbol >= 'a') && (symbol <= 'z'))) {
+                symbol = std::toupper(static_cast<unsigned char>(symbol));
+
+                // Replace 'J' with 'I' for Playfair cipher
+                if (symbol == 'J') {
+                    symbol = 'I';
+                }
+
+                preparedText += symbol;
+            }
+        }
+
+        return preparedText;
+    }   
+
 
 
     // Implementation for finding the position of a character in the key square
     // This function will return a Position struct indicating the row and column of the character
-    cipher::PlayfairCipher::Position cipher::PlayfairCipher::findPosition(char c) const {
-  
+    cipher::PlayfairCipher::Position cipher::PlayfairCipher::findPosition(char symbol) const {
+        Position pos;
+
+        for (size_t i = 0; i < MatrixSize; ++i) {
+            for (size_t j = 0; j < MatrixSize; ++j) {
+                if (matrix_[i][j] == symbol) {
+                    pos.row = i;
+                    pos.col = j;
+                    return pos;
+                }
+            }
+        }
+
+        throw std::logic_error("Character not found in Playfair matrix.");
     }
 
     
     // Implementation for encrypting a single Playfair digraph
     // This function will return a pair of characters representing the encrypted digraph 
     std::pair<char, char> cipher::PlayfairCipher::encryptPair(char first, char second) const {
-    
+        Position firstPos = findPosition(first);
+        Position secondPos = findPosition(second);
+
+        std::pair<char, char> digraph
+        ;
+        // 1 case: diff rows and cols
+        if ((firstPos.row != secondPos.row) && (firstPos.col != secondPos.col)) {
+            digraph.first = matrix_[firstPos.row][secondPos.col];
+            digraph.second = matrix_[secondPos.row][firstPos.col];
+        }
+
+        // 2 case: same rows -> move right by 1
+        if (firstPos.row == secondPos.row) {
+            digraph.first = matrix_[firstPos.row][(firstPos.col + 1) % MatrixSize];
+            digraph.second = matrix_[secondPos.row][(secondPos.col + 1) % MatrixSize];
+        }
+
+        // 3 case: same cols -> move down by 1
+        if (firstPos.col == secondPos.col) {
+            digraph.first = matrix_[(firstPos.row + 1) % MatrixSize][firstPos.col];
+            digraph.second = matrix_[(secondPos.row + 1) % MatrixSize][secondPos.col];
+        }
+
+
+        return digraph;
     }
 
     
     // Implementation for decrypting a single Playfair digraph
     // This function will return a pair of characters representing the decrypted digraph
     std::pair<char, char> cipher::PlayfairCipher::decryptPair(char first, char second) const {
+        Position firstPos = findPosition(first);
+        Position secondPos = findPosition(second);
+
+        std::pair<char, char> digraph;
+
+        // 1 case: diff rows and cols
+        if ((firstPos.row != secondPos.row) && (firstPos.col != secondPos.col)) {
+            digraph.first = matrix_[firstPos.row][secondPos.col];
+            digraph.second = matrix_[secondPos.row][firstPos.col];
+        }
+
+        // 2 case: same rows -> move left by 1
+        if (firstPos.row == secondPos.row) {
+            digraph.first = matrix_[firstPos.row][(firstPos.col + MatrixSize - 1) % MatrixSize];
+            digraph.second = matrix_[secondPos.row][(secondPos.col + MatrixSize - 1) % MatrixSize];
+        }
+
+        // 3 case: same cols -> move up by 1
+        if (firstPos.col == secondPos.col) {
+            digraph.first = matrix_[(firstPos.row + MatrixSize - 1) % MatrixSize][firstPos.col];
+            digraph.second = matrix_[(secondPos.row + MatrixSize - 1) % MatrixSize][secondPos.col];
+        }
    
+        return digraph;
     }
     
     
     // Implementation for encrypting the input text using the Playfair cipher
     // This function will return the encrypted ciphertext  
     std::string cipher::PlayfairCipher::encrypt(const std::string& plaintext) const {
-  
+        std::string preparedText = preparePlaintext(plaintext);
+        std::string encryptedText;
+
+        size_t preparedTextLength = preparedText.size();
+        std::pair<char, char> digraph;
+
+        for (size_t i = 0; i < preparedTextLength; i += 2) {
+            digraph = encryptPair(preparedText[i], preparedText[i+1]);
+
+            encryptedText.push_back(digraph.first);
+            encryptedText.push_back(digraph.second);
+        }
+
+        return encryptedText;
     }
 
 
     // Implementation for decrypting the input text using the Playfair cipher
     // This function will return the decrypted plaintext    
     std::string cipher::PlayfairCipher::decrypt(const std::string& ciphertext) const {
- 
+        validateCipherText(ciphertext);
+        std::string preparedText = prepareCiphertext(ciphertext);
+        std::string decryptedText;
+
+        size_t preparedTextLength = preparedText.size();
+        std::pair <char, char> digraph;
+
+        for (size_t i = 0; i < preparedTextLength; i += 2) {
+             digraph = decryptPair(preparedText[i], preparedText[i+1]);
+
+             decryptedText.push_back(digraph.first);
+             decryptedText.push_back(digraph.second);
+        }
+
+        return decryptedText;
     }
 }
