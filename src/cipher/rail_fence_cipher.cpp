@@ -77,6 +77,53 @@ namespace cryptolibrium {
     // Implementation for decrypting the input text using the Playfair cipher
     // This function will return the decrypted plaintext    
     std::string cipher::RailFenceCipher::decrypt(const std::string& ciphertext) const {
-        
+        std::vector<std::size_t> symbolsInRails(rails_);
+        std::vector<std::size_t> railsRoute;
+        std::size_t ciphertextLength = ciphertext.length();
+        bool movingDown = true;
+
+        // 1. Generate rail pattern
+        for (std::size_t i = 0, currentRail = 0; i < ciphertextLength; ++i) {
+            //railsRoute += currentRail;
+            railsRoute.push_back(currentRail);
+            
+            // up or bottom border
+            if (currentRail == rails_ - 1) {
+                movingDown = false;
+            }
+            else if (currentRail == 0) {
+                movingDown = true;
+            }
+
+            // next rail
+            if (movingDown) {++currentRail;} else {--currentRail;}            
+        }
+
+        // 2. Count number of symbols in each rail
+        for (std::size_t i = 0; i < ciphertextLength; ++i) {
+            symbolsInRails[railsRoute[i]]++;
+        }
+
+        // 3. Split ciphertext into rails
+        std::vector<std::string> railText(rails_);
+        std::size_t tmpIndex = 0;
+
+        for (std::size_t i = 0; i < rails_; ++i) {
+            for (std::size_t j = 0; j < symbolsInRails[i]; ++j) {
+                railText[i] += ciphertext[tmpIndex];
+                tmpIndex++;
+            }
+        }
+
+        // 4. Reconstruct plaintext following the rail route
+        std::string decryptedText;
+        std::vector<size_t> currentSymbolInRail(rails_);
+
+        for (std::size_t rail : railsRoute) {
+            decryptedText += railText[rail][currentSymbolInRail[rail]];
+            ++currentSymbolInRail[rail];
+        }
+
+        return decryptedText;
     }
 }
