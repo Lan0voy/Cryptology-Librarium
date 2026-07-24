@@ -42,6 +42,36 @@ void expectEncrypt(const std::size_t& rails, const std::string& plaintext, const
     }
 }
 
+// Help function to test Rail-Fence-Cipher decrypt
+void expectDecrypt(const std::size_t& rails, const std::string& ciphertext, const std::string& plaintext, const std::string& testCaseDescription) {
+    RailFenceCipher cipher(rails);
+
+    if (cipher.decrypt(ciphertext) == plaintext) {
+       std::cout << "✓ " <<  testCaseDescription << " test passed." << std::endl;        
+    } else {
+        std::cerr << "✗ " << testCaseDescription << " test failed." << std::endl;
+        std::cerr << "Expected: " << plaintext << std::endl;
+        std::cerr << "Actual:   " << cipher.decrypt(ciphertext) << std::endl;
+        assert(false);
+    }
+}
+
+// Help function to round-trip test Rail-Fence-Cipher 
+void expectRoundTrip(
+    const std::size_t& rails,
+    const std::string& text,
+    const std::string& testCaseDescription) 
+{
+    RailFenceCipher cipher(rails);
+
+    if (cipher.decrypt(cipher.encrypt(text)) == text) {
+        std::cout << "✓ " << testCaseDescription << " test passed." << std::endl;
+    } else {
+        std::cerr << "✗ " << testCaseDescription << " test failed." << std::endl;
+        assert(false);        
+    }
+}
+
 int main() {
     // =========================
     // 1. Rails Validation Tests
@@ -185,4 +215,101 @@ int main() {
         "HELLO",
         "2.16 Rails == plaintext length"
     );
+
+
+    // =========================
+    // 3. Decryption Tests
+    // =========================
+
+    // 3.1 Empty string
+    expectDecrypt(
+        3,
+        "",
+        "",
+        "3.1 Empty string"
+    );
+
+
+    // 3.2 Single character
+    expectDecrypt(
+        3,
+        "A",
+        "A",
+        "3.2 Single character"
+    );
+
+    // 3.3 Two characters
+    expectDecrypt(
+        3,
+        "AB",
+        "AB",
+        "3.3 Two characters"
+    );
+
+    // 3.4 Three characters
+    expectDecrypt(
+        3,
+        "ABC",
+        "ABC",
+        "3.4 Three characters"
+    );
+
+    // 3.5 Classic example
+    expectDecrypt(
+        3,
+        "WECRLTEERDSOEEFEAOCAIVDEN",
+        "WEAREDISCOVEREDFLEEATONCE",
+        "3.5 Classic example"
+    );
+
+    // 3.6 HELLOWORLD (3 rails)
+    expectDecrypt(
+        3,
+        "HOLELWRDLO",
+        "HELLOWORLD",
+        "3.6 HELLOWORLD (3 rails)"
+    );
+
+    // 3.7 HELLOWORLD (2 rails)
+    expectDecrypt(
+        2,
+        "HLOOLELWRD",
+        "HELLOWORLD",
+        "3.7 HELLOWORLD (2 rails)"
+    );
+
+    // 3.8 Spaces
+    expectDecrypt(
+        3,
+        "HOREL OLLWD",
+        "HELLO WORLD",
+        "3.8 Spaces"
+    );
+
+    // 3.9 Digits
+    expectDecrypt(
+        3,
+        "A2ZB13YCX",
+        "ABC123XYZ",
+        "3.9 Digits"
+    );
+
+    // 3.10 Punctuation
+    expectDecrypt(
+        3,
+        "HOEL!L",
+        "HELLO!",
+        "3.10 Punctuation"
+    );
+
+    
+    // =========================
+    // 4. Round-trip Tests
+    // =========================
+
+    expectRoundTrip(2, "HELLOWORLD", "4.1 Round-trip");
+    expectRoundTrip(3, "Hello, World!", "4.2 Mixed characters");
+    expectRoundTrip(5, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "4.3 Alphabet");
+    expectRoundTrip(7, "", "4.4 Empty string");
+    expectRoundTrip(4, "1234567890!@#$%^&*()", "4.5 All characters");    
 }
